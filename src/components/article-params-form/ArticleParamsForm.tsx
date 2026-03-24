@@ -9,6 +9,7 @@ import { RadioGroup } from 'src/ui/radio-group';
 import { Select } from 'src/ui/select/Select';
 
 import {
+	ArticleStateType,
 	backgroundColors,
 	contentWidthArr,
 	defaultArticleState,
@@ -18,7 +19,11 @@ import {
 } from 'src/constants/articleProps';
 import { Separator } from 'src/ui/separator';
 
-export const ArticleParamsForm = () => {
+type ArticleParamsFormProps = {
+	onApply: (state: ArticleStateType) => void;
+};
+
+export const ArticleParamsForm = ({ onApply }: ArticleParamsFormProps) => {
 	const [isOpen, setIsOpen] = useState(false);
 	const containerRef = useRef<HTMLElement>(null);
 
@@ -58,6 +63,31 @@ export const ArticleParamsForm = () => {
 		};
 	}, [isOpen]);
 
+	const handleSubmit = (event: React.FormEvent) => {
+		event.preventDefault();
+
+		onApply({
+			...defaultArticleState,
+			fontFamilyOption: fontFamily,
+			fontSizeOption: fontSize,
+			fontColor: fontColor,
+			contentWidth: contentWidth,
+			backgroundColor: backgroundColor,
+		});
+	};
+
+	const handleReset = (event: React.FormEvent) => {
+		event.preventDefault();
+
+		setFontFamily(defaultArticleState.fontFamilyOption);
+		setFontSize(defaultArticleState.fontSizeOption);
+		setFontColor(defaultArticleState.fontColor);
+		setBackgroundColor(defaultArticleState.backgroundColor);
+		setContentWidth(defaultArticleState.contentWidth);
+
+		onApply(defaultArticleState);
+	};
+
 	return (
 		<>
 			<ArrowButton isOpen={isOpen} onClick={handleClick} />
@@ -66,7 +96,10 @@ export const ArticleParamsForm = () => {
 					[styles.container_open]: isOpen,
 				})}
 				ref={containerRef}>
-				<form className={styles.form}>
+				<form
+					className={styles.form}
+					onSubmit={handleSubmit}
+					onReset={handleReset}>
 					<Text
 						size={31}
 						dynamic={false}
